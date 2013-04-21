@@ -118,7 +118,27 @@ def apply_clustering_kmeans(nb_groups):
     #objective_fn = result[1]
     #frac_reassigned = result[2]
     #num_iterations = result[3]
-    return centroids
+
+    # init clusters
+    clusters = []
+    for c in centroids:
+        clusters.append((c, []))
+
+    # assign each point to its cluster
+    points = get_points()
+    for p in points:
+        # compute distances
+        distances = []
+        for c in centroids:
+            distances.append(math.pow(c[0] - p[0], 2) + math.pow(c[1] - p[1], 2))
+        # get the indice of the nearest centroid
+        nearest = 0
+        for i in range(1, len(distances)):
+            if(distances[i] < distances[nearest]):
+                nearest = i
+        clusters[nearest][1].append(p)
+
+    return clusters
 
 def apply_clustering_kmeanspp(nb_groups): 
     """
@@ -131,9 +151,29 @@ def apply_clustering_kmeanspp(nb_groups):
     #objective_fn = result[1]
     #frac_reassigned = result[2]
     #num_iterations = result[3]
-    return centroids
 
-def export_to_png(points, centroids):
+    # init clusters
+    clusters = []
+    for c in centroids:
+        clusters.append((c, []))
+
+    # assign each point to its cluster
+    points = get_points()
+    for p in points:
+        # compute distances
+        distances = []
+        for c in centroids:
+            distances.append(math.pow(c[0] - p[0], 2) + math.pow(c[1] - p[1], 2))
+        # get the indice of the nearest centroid
+        nearest = 0
+        for i in range(1, len(distances)):
+            if(distances[i] < distances[nearest]):
+                nearest = i
+        clusters[nearest][1].append(p)
+
+    return clusters
+
+def export_to_png(clusters):
     """
     Visualize the result in a PNG file
     """
@@ -157,32 +197,20 @@ def export_to_png(points, centroids):
             for j in range(max(0, int(x)-2), min(ds_max_x, int(x)+3)):
                 bitmap[i * ds_max_x + j] = color
 
-    # Display points
     bitmap = [(255,255,255)] * ds_max_x * ds_max_y
-    for p in points:
-        # determine the nearest centroid
 
-        # compute distances
-        distances = []
-        for c in centroids:
-            distances.append(math.pow(c[0] - p[0], 2) + math.pow(c[1] - p[1], 2))
-        # get the indice of the nearest centroid
-        minimum = 0
-        for i in range(1, len(distances)):
-            if(distances[i] < distances[minimum]):
-                minimum = i
-        bitmap[p[1] * ds_max_x + p[0]] = colors[minimum]
-
-    # Display centroids
     i = 0
-    for c in centroids:
-        display_centroid(bitmap, c[0], c[1], colors[i])
-        i = i + 1
+    for centroid, points in clusters:
+        # display points
+        for p in points:
+            bitmap[p[1] * ds_max_x + p[0]] = colors[i]
+        # display centroid
+        display_centroid(bitmap, centroid[0], centroid[1], colors[i])
+        i += 1
 
     img = Image.new("RGB", (ds_max_x, ds_max_y))
     img.putdata(bitmap)
     return img
-    # img.save(output_file)
 
 def parse_args(argv):
     """
@@ -241,14 +269,13 @@ def main(args):
         insert_random_data(nb_groups)
         
     print("Clustering data using k-means algorithm...")
-    kmeans_centroids = apply_clustering_kmeans(nb_groups)
+    kmeans_clusters = apply_clustering_kmeans(nb_groups)
     print("Clustering data using k-means++ algorithm...")
-    kmeanspp_centroids = apply_clustering_kmeanspp(nb_groups)
+    kmeanspp_clusters = apply_clustering_kmeanspp(nb_groups)
 
     print("Exporting to " + output_file + "...")
-    points = get_points()
-    kmeans_img = export_to_png(points, kmeans_centroids)
-    kmeanspp_img = export_to_png(points, kmeanspp_centroids)
+    kmeans_img = export_to_png(kmeans_clusters)
+    kmeanspp_img = export_to_png(kmeanspp_clusters)
 
     result_img = Image.new("RGB", (ds_max_x * 2, ds_max_y))
     result_img.paste(kmeans_img, (0, 0))
