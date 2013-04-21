@@ -26,20 +26,6 @@ group_max_height = 100
 default_output_file = "clustered_data.png"
 db = postgresql.open("pq://" + db_user + "@" + db_server + ":" + str(db_port) + "/" + db_name)
 
-# colors = {
-#     "red" : (255, 0, 0),
-#     "green" : (0, 255, 0),
-#     "blue" : (0, 0, 255),
-#     "yellow" : (255, 255, 0),
-#     "cyan" : (0, 255, 255),
-#     "pink" : (255, 0, 255),
-#     "grey" : (96, 96, 96),
-#     "dark_red" : (96, 0, 0),
-#     "dark_green" : (0, 96, 0),
-#     "dark_blue" : (0, 0, 96),
-#     "black" : (0, 0, 0)
-#     }
-
 colors = [
     (255, 0, 0), # red
     (0, 255, 0), # green
@@ -82,6 +68,8 @@ def insert_random_data(nb_groups):
     """
     Populate the table with groups of points chosen randomly
     """
+    clusters = []
+
     # for each group
     for i in range(nb_groups):
         width = random.randint(1, group_max_width)
@@ -89,13 +77,16 @@ def insert_random_data(nb_groups):
         nb_elts = random.randint(1, group_max_elts)
         min_x = random.randint(1, ds_max_x - width)
         min_y = random.randint(1, ds_max_y - height)
+        clusters.append( ((min_x + width/2, min_y + height/2), []) )
 
         # points generation
         for j in range(nb_elts):
             x = gaussian_random(min_x, min_x + width)
             y = gaussian_random(min_y, min_y + height)
+            clusters[i][1].append((x,y))
             db.execute("INSERT INTO " + db_table_name + " (" + db_field_name + ") VALUES (" +
                        "'{" + str(x) + "," + str(y) + "}');")
+    return clusters
 
 def get_points():
     """
@@ -266,7 +257,9 @@ def main(args):
         print("Creating test table...")
         create_test_table()
         print("Generating random data...")
-        insert_random_data(nb_groups)
+        original_clusters = insert_random_data(nb_groups)
+    else:
+        pass
         
     print("Clustering data using k-means algorithm...")
     kmeans_clusters = apply_clustering_kmeans(nb_groups)
@@ -274,12 +267,14 @@ def main(args):
     kmeanspp_clusters = apply_clustering_kmeanspp(nb_groups)
 
     print("Exporting to " + output_file + "...")
+    original_img = export_to_png(original_clusters)
     kmeans_img = export_to_png(kmeans_clusters)
     kmeanspp_img = export_to_png(kmeanspp_clusters)
 
-    result_img = Image.new("RGB", (ds_max_x * 2, ds_max_y))
-    result_img.paste(kmeans_img, (0, 0))
-    result_img.paste(kmeanspp_img, (ds_max_x + 1, 0))
+    result_img = Image.new("RGB", (ds_max_x * 3, ds_max_y))
+    result_img.paste(original_img, (0, 0))
+    result_img.paste(kmeans_img, (ds_max_x + 1, 0))
+    result_img.paste(kmeanspp_img, ((ds_max_x + 1) * 2, 0))
     result_img.save(output_file)
     
 if(__name__ == "__main__"):
