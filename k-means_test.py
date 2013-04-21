@@ -6,7 +6,7 @@ import sys
 import getopt
 import math
 import pickle
-from PIL  import Image
+from PIL  import Image, ImageDraw
 
 # db informations
 db_name = "madlib"
@@ -242,11 +242,16 @@ def generate_output(output_file, clusters_set):
     """
     Display all the clustering results on a single image
     """
+    def add_title(img, title):
+        draw = ImageDraw.Draw(img)
+        draw.text((10, 10), description, fill=colors[10]) # black
+
     result_img = Image.new("RGB", (ds_max_x * len(clusters_set), ds_max_y))
 
     i = 0
     for clusters, description in clusters_set:
         tmp_img = export_to_png(clusters)
+        add_title(tmp_img, description)
         result_img.paste(tmp_img, (i * (ds_max_x + 1), 0))
         i += 1
     result_img.save(output_file)
