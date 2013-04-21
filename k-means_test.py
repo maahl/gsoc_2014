@@ -232,6 +232,19 @@ def parse_args(argv):
         raise Exception("Please specify the number of clusters.")
     return regen, nb_groups, output_file
 
+def generate_output(output_file, clusters_set):
+    """
+    Display all the clustering results on a single image
+    """
+    result_img = Image.new("RGB", (ds_max_x * len(clusters_set), ds_max_y))
+
+    i = 0
+    for clusters, description in clusters_set:
+        tmp_img = export_to_png(clusters)
+        result_img.paste(tmp_img, (i * (ds_max_x + 1), 0))
+        i += 1
+    result_img.save(output_file)
+
 def usage():
     print("""
 Usage:
@@ -257,25 +270,19 @@ def main(args):
         print("Creating test table...")
         create_test_table()
         print("Generating random data...")
-        original_clusters = insert_random_data(nb_groups)
+        original_clusters = (insert_random_data(nb_groups), "Original clustering")
     else:
         pass
         
     print("Clustering data using k-means algorithm...")
-    kmeans_clusters = apply_clustering_kmeans(nb_groups)
+    kmeans_clusters = (apply_clustering_kmeans(nb_groups), "K-means clustering")
     print("Clustering data using k-means++ algorithm...")
-    kmeanspp_clusters = apply_clustering_kmeanspp(nb_groups)
+    kmeanspp_clusters = (apply_clustering_kmeanspp(nb_groups), "K-means++ clustering")
 
     print("Exporting to " + output_file + "...")
-    original_img = export_to_png(original_clusters)
-    kmeans_img = export_to_png(kmeans_clusters)
-    kmeanspp_img = export_to_png(kmeanspp_clusters)
+    generate_output(output_file, [ original_clusters, kmeans_clusters, kmeanspp_clusters])
 
-    result_img = Image.new("RGB", (ds_max_x * 3, ds_max_y))
-    result_img.paste(original_img, (0, 0))
-    result_img.paste(kmeans_img, (ds_max_x + 1, 0))
-    result_img.paste(kmeanspp_img, ((ds_max_x + 1) * 2, 0))
-    result_img.save(output_file)
-    
+    print("Done.")
+
 if(__name__ == "__main__"):
     main(sys.argv[1:])
