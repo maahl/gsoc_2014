@@ -264,6 +264,15 @@ def print_line(line):
     print(line, end = "")
     sys.stdout.flush()
 
+def count_points(clusters):
+    """
+    Counts the points in a cluster set
+    """
+    nb_points = 0
+    for c in clusters:
+        nb_points += len(c[1])
+    return nb_points
+
 def usage():
     print("""
 Usage:
@@ -293,10 +302,10 @@ def main(args):
         original_clusters = (insert_random_data(nb_groups), "Original clustering")
         finish = time.time()
 
-        nb_points = 0
-        for cluster in original_clusters[0]:
-            nb_points += len(cluster[1])
-        print("Generated " + str(nb_points) + " points partitioned into " + 
+        # nb_points = 0
+        # for cluster in original_clusters[0]:
+        #     nb_points += len(cluster[1])
+        print("Generated " + str(count_points(original_clusters[0])) + " points partitioned into " + 
               str(len(original_clusters[0])) + " clusters in " +
               str(finish - start)[:6] + " seconds.")
     else:
