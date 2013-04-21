@@ -5,6 +5,7 @@ import random
 import sys
 import getopt
 import math
+import pickle
 from PIL  import Image
 
 # db informations
@@ -14,6 +15,7 @@ db_server = "localhost"
 db_port = 5432
 db_table_name = "k_means_test"
 db_field_name = "coord"
+db = postgresql.open("pq://" + db_user + "@" + db_server + ":" + str(db_port) + "/" + db_name)
 
 # dataset informations
 ds_max_groups = 10
@@ -24,7 +26,7 @@ group_max_width = 100
 group_max_height = 100
 
 default_output_file = "clustered_data.png"
-db = postgresql.open("pq://" + db_user + "@" + db_server + ":" + str(db_port) + "/" + db_name)
+data_file = "clusters.dat"
 
 colors = [
     (255, 0, 0), # red
@@ -86,6 +88,12 @@ def insert_random_data(nb_groups):
             clusters[i][1].append((x,y))
             db.execute("INSERT INTO " + db_table_name + " (" + db_field_name + ") VALUES (" +
                        "'{" + str(x) + "," + str(y) + "}');")
+
+    # save clusters informations in a file
+    data_dump = open(data_file, "wb")
+    pickle.dump(nb_groups, data_dump)
+    pickle.dump(clusters, data_dump)
+    data_dump.close()
     return clusters
 
 def get_points():
@@ -228,8 +236,6 @@ def parse_args(argv):
         elif opt in ("-n", "--nb-groups"):
             nb_groups = arg
 
-    if(nb_groups == 0 and not regen):
-        raise Exception("Please specify the number of clusters.")
     return regen, nb_groups, output_file
 
 def generate_output(output_file, clusters_set):
@@ -272,7 +278,14 @@ def main(args):
         print("Generating random data...")
         original_clusters = (insert_random_data(nb_groups), "Original clustering")
     else:
-        pass
+        try:
+            data_dump = open(data_file, "rb")
+            nb_groups = pickle.load(data_dump)
+            original_clusters = (pickle.load(data_dump), "Original clustering")
+            data_dump.close
+        except FileNotFoundError:
+            print("Cannot load data, you need to generate some data first. Use --regen argument.")
+            exit(3)
         
     print("Clustering data using k-means algorithm...")
     kmeans_clusters = (apply_clustering_kmeans(nb_groups), "K-means clustering")
