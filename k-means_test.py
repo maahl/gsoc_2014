@@ -6,6 +6,7 @@ import sys
 import getopt
 import math
 import pickle
+import time
 from PIL  import Image, ImageDraw
 
 # db informations
@@ -217,7 +218,7 @@ def parse_args(argv):
     """
     try:
         opts, args = getopt.getopt(argv, "ho:rn:", 
-                               ["regen", "help", "output-file=", "nb-groups="])
+                                   ["regen", "help", "output-file=", "nb-groups="])
     except getopt.GetOptError:
         usage()
         sys.exit(2)
@@ -256,6 +257,13 @@ def generate_output(output_file, clusters_set):
         i += 1
     result_img.save(output_file)
 
+def print_line(line):
+    """
+    Same as print, but allows to rewrite at the end of the line
+    """
+    print(line, end = "")
+    sys.stdout.flush()
+
 def usage():
     print("""
 Usage:
@@ -280,25 +288,52 @@ def main(args):
         nb_groups = random.randint(2, ds_max_groups)
         print("Creating test table...")
         create_test_table()
-        print("Generating random data...")
+        print_line("Generating random data... ")
+        start = time.time()
         original_clusters = (insert_random_data(nb_groups), "Original clustering")
+        finish = time.time()
+
+        nb_points = 0
+        for cluster in original_clusters[0]:
+            nb_points += len(cluster[1])
+        print("Generated " + str(nb_points) + " points partitioned into " + 
+              str(len(original_clusters[0])) + " clusters in " +
+              str(finish - start)[:6] + " seconds.")
     else:
         try:
+            print_line("Loading data from " + data_file + "... ")
+            start = time.time()
             data_dump = open(data_file, "rb")
             nb_groups = pickle.load(data_dump)
             original_clusters = (pickle.load(data_dump), "Original clustering")
             data_dump.close
+            finish = time.time()
+            
+            print("Data loaded in " + str(finish - start)[:5] + " seconds.")
         except FileNotFoundError:
             print("Cannot load data, you need to generate some data first. Use --regen argument.")
             exit(3)
-        
-    print("Clustering data using k-means algorithm...")
-    kmeans_clusters = (apply_clustering_kmeans(nb_groups), "K-means clustering")
-    print("Clustering data using k-means++ algorithm...")
-    kmeanspp_clusters = (apply_clustering_kmeanspp(nb_groups), "K-means++ clustering")
 
-    print("Exporting to " + output_file + "...")
+    # k-means clustering
+    print_line("Clustering data using k-means algorithm... ")
+    start = time.time()
+    kmeans_clusters = (apply_clustering_kmeans(nb_groups), "K-means clustering")
+    finish = time.time()
+    print("Data clustered in " + str(finish - start)[:5] + " seconds.")
+
+    # k-means++ clustering
+    print_line("Clustering data using k-means++ algorithm... ")
+    start = time.time()
+    kmeanspp_clusters = (apply_clustering_kmeanspp(nb_groups), "K-means++ clustering")
+    finish = time.time()
+    print("Data clustered in " + str(finish - start)[:5] + " seconds.")
+
+    # output generation
+    print_line("Exporting to " + output_file + "...")
+    start = time.time()
     generate_output(output_file, [ original_clusters, kmeans_clusters, kmeanspp_clusters])
+    finish = time.time()
+    print("File generated in " + str(finish - start)[:5] + " seconds.")
 
     print("Done.")
 
