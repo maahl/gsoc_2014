@@ -268,7 +268,7 @@ Options:
         Generate new points. You should use it at your first run.
     -n, --nb-groups n:
         Generate n groups of points. If not generating points, classify in n 
-        clusters. This argument is mandatory if you don't generate new points.
+        clusters. 
     -h, --help:
         Display this help message.
 """)
