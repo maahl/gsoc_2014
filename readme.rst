@@ -12,8 +12,8 @@ Benefits to the PostgreSQL community
 ------------------------------------
 
 Currently, only the k-means clustering algorithm is implemented in
-MADlib (see `Link the doc
-<http://doc.madlib.net/latest/group__grp__clustering.html>`). The
+MADlib (see the doc:
+http://doc.madlib.net/latest/group__grp__clustering.html ). The
 k-medoids algorithm, while being computationnally more intensive, is
 much less sensitive to outliers (points that don't belong obviously to
 one cluster or another). This is interesting on noisy datasets, that's
@@ -21,10 +21,9 @@ why I'm planning to implement it during the first part of the GSoC.
 
 Still, these algorithms are based on distance computation, therefore
 they can only find convex clusters. That's why I'm proposing to
-implement the `Link OPTICS
-<http://en.wikipedia.org/wiki/OPTICS_algorithm>` (*ordering points to
-identify the clustering structure*), which addresses this
-issue, as the second part of this GSoC project.
+implement the OPTICS (*ordering points to identify the clustering
+structure*, see http://en.wikipedia.org/wiki/OPTICS_algorithm ), which
+addresses this issue, as the second part of this GSoC project.
 
 The PostgreSQL community would benefit from these features, as it
 would make available clustering algorithms more powerful than simple
@@ -60,8 +59,8 @@ OPTICS
 The second part of this project would be to implement the
 density-based clustering algorithm OPTICS, which would overcome the
 main problem of both the k-means and k-medoids algorithm: non-convex
-clusters. This algorithm has been preferred over `Link DBSCAN
-<http://en.wikipedia.org/wiki/DBSCAN>` as it is able to detect
+clusters. This algorithm has been preferred over DBSCAN
+(http://en.wikipedia.org/wiki/DBSCAN>) as it is able to detect
 clusters of different densities, and, consequently, overlapping
 clusters.
 
