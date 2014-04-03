@@ -60,7 +60,7 @@ The second part of this project would be to implement the
 density-based clustering algorithm OPTICS, which would overcome the
 main problem of both the k-means and k-medoids algorithm: non-convex
 clusters. This algorithm has been preferred over DBSCAN
-(http://en.wikipedia.org/wiki/DBSCAN>) as it is able to detect
+(http://en.wikipedia.org/wiki/DBSCAN ) as it is able to detect
 clusters of different densities, and, consequently, overlapping
 clusters.
 
