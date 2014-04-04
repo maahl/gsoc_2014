@@ -33,12 +33,30 @@ This algorithm is usually pretty fast (even though it can be made to
 take an exponential time to converge). Still, it is easy to get a
 wrong result because of local convergence, e.g. having one cluster
 split in two parts by the algorithm, or two clusters merged. It is
-also pretty sensitive to outliers.
+also pretty sensitive to outliers, and the final result depend greatly
+on the initial centroids.
 
 This algorithm doesn't work well with non-euclidean distance, also.
 
 k-medoids
 ---------
+
+The k-medoids algorithm works the same way as k-means, save for a few
+exceptions.
+
+With k-medoids, the centroids are always points of the dataset (and
+are then called medoids). The new medoids are the points in clusters
+which minimize the sum of pairwise dissimilarities (in other terms,
+the point for which the average distance to other points in the
+cluster is minimal). This makes the algorithm less sensitive to
+outliers than k-means.
+
+This algorithm is computationnally more intensive than k-means, but
+still fast.
+
+As for k-means, it is possible to run the algorithm several times with
+different initial centroids, and get the best result (i.e. the one
+that minimizes the sum of distances from points to their centroids).
 
 DB-SCAN
 -------
@@ -50,4 +68,5 @@ Bibliography
 ------------
 
 http://en.wikipedia.org
+
 http://www.stat.cmu.edu/~ryantibs/datamining/lectures/04-clus1-marked.pdf
