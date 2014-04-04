@@ -16,13 +16,13 @@ k-means
 -------
 
 The k-means algorithm is the one implemented in MADlib. It selects
-``k`` points, either randomly, among the dataset, or set by the user,
-to use as initial centroids (center of clusters). ``k`` must be
+*k* points, either randomly, among the dataset, or set by the user,
+to use as initial centroids (center of clusters). *k* must be
 defined by the user; the algorithm is unable to guess the number of
 clusters.
 
 All the points in the dataset are then affected to the nearest
-centroid, thus making ``k`` clusters.
+centroid, thus making *k* clusters.
 
 The next step is to compute the new centroids as a "mean" of all the
 points in a cluster. Then reassign all the points to then new
@@ -50,3 +50,4 @@ Bibliography
 ------------
 
 http://en.wikipedia.org
+http://www.stat.cmu.edu/~ryantibs/datamining/lectures/04-clus1-marked.pdf
