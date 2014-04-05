@@ -96,15 +96,36 @@ of its neighbours, and so on.
 The main problem with DBSCAN is that it doesn't work well for clusters
 with very different densities.
 
-
 OPTICS
 ------
+
+OPTICS (*Ordering Points to Identify the Clustering Structure*)
+addresses this issue.
+
+The first step in OPTICS is to order the points so that two points
+that are near each other will be in nearby positions, and store the
+smallest reachability distance of each point (i.e. the distance at
+which the point would be considered dense by DBSCAN).
+
+The next step is to determine the clusters from the data obtained at
+the previous step. This can be done visually: by plotting the ordered
+points on *x* and their smallest reachability distance on *y*, the
+clusters are the valleys formed by the curve.
+
+I'll add more details to this section when I understand better how all
+of this works.
 
 Bibliography
 ------------
 
-http://en.wikipedia.org where clustering algorithms are well detailed
+http://en.wikipedia.org : where clustering algorithms are well
+detailed
 
 http://www.stat.cmu.edu/~ryantibs/datamining/lectures/04-clus1-marked.pdf
+: introduction to k-means and k-medoids
 
 http://www.vitavonni.de/blog/201211/2012110201-dbscan-and-optics-clustering.html
+: short introduction to DBSCAN and OPTICS
+
+http://www.cs.uiuc.edu/class/fa05/cs591han/papers/ankerst99.pdf :
+original paper presenting OPTICS
